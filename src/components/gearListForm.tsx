@@ -172,7 +172,7 @@ const GearListForm = (): JSX.Element => {
                       onRemove={handleItemRemoved}
                     />
                   ))}
-                  <div className="flex flex-col items-center w-full">
+                  <div className="flex flex-col items-center ml-12">
                     <CreatableSelect
                       menuPlacement="auto"
                       className="gear-select"

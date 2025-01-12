@@ -6,7 +6,7 @@ const App = (): JSX.Element => {
     <>
       <div>
         <Header />
-        <div className="mx-6 flex flex-col justify-center">
+        <div className="mx-3 sm:mx-6 flex flex-col justify-center">
           <GearListForm />
         </div>
       </div>

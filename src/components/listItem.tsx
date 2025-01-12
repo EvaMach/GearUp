@@ -58,24 +58,22 @@ const ListItem = ({ group, name, count, onRemove }: Props): JSX.Element => {
       <button
         type="button"
         onClick={(): void => setChecked(!checked)}
-        className="grid grid-cols-[2rem_minmax(5rem,_1fr)_2rem] border-2 lg:h-10 min-w-5 lg:min-w-15 justify-between items-center w-1/2 p-1 h-9 min-h-min rounded-lg px-2"
+        className="grid grid-cols-[2rem_minmax(6rem,_1fr)_2rem] border-2 min-w-5 lg:min-w-15 justify-between items-center p-1 min-h-min rounded-lg px-2 w-48"
       >
         {checked ? (
           <CheckedIcon className="w-4" />
         ) : (
           <UncheckedIcon className="w-4" />
         )}
-        <div className="text-left">
-          <p className="overflow-auto whitespace-nowrap lg:whitespace-normal">
-            {name}
-          </p>
+        <div className="text-left overflow-auto">
+          {name}
         </div>
         <IconButton onClick={removeItem}>
           <BinIcon className="fill-gray-300 w-4 hover:fill-primary" />
         </IconButton>
       </button>
       <IconButton onClick={removeItem}>
-        <ShopIcon className="fill-textColor w-5 hover:fill-accent" />
+        <ShopIcon className="fill-textColor w-4 hover:fill-accent" />
       </IconButton>
     </div >
   );
