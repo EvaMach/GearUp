@@ -1,56 +1,34 @@
-// import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
-import { MongoClient } from "npm:mongodb@5.6.0";
+import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
+const { APP_ID, DATA_API_KEY } = await load();
 
-// const { MONGODB_URI } = await load();
-// 
+export const BASE_URI = `https://eu-central-1.aws.data.mongodb-api.com/app/${APP_ID}/endpoint/data/v1/action`;
+const DATA_SOURCE = "Cluster0";
+const DATABASE = "gearup_db";
+const COLLECTION = "gear";
 
+export const DB_OPTIONS = {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "api-key": DATA_API_KEY,
+  },
+  body: ""
+};
 
-
-try {
-  // console.log("Before connecting to MongoDB");
-  // await client.db("admin").command({ ping: 1 });
-  // console.log("Connected to MongoDB");
-  // await client.db("gearup_db").command({ ping: 1 });
-  // console.log("Connected to MongoDB");
-
-} catch (error) {
-  console.log("Error connecting to MongoDB", error);
+export interface Query<T> {
+  collection: string;
+  database: string;
+  dataSource: string;
+  filter: T;
+  limit?: number;
 }
 
-// const db = client.db('gearup_db');
-// const gear = db.collection<GearItem>('gear');
-
-
-interface GearItem {
-  _id: { $oid: string; };
-  name: string;
-  type: 'tent' | 'hotel' | 'all';
-  amount: number;
-}
-
-// export const getGear = async ({ response }: { response: any; }) => {
-//   try {
-//     const allGear = await gear.find({}).toArray();
-//     console.log(allGear);
-//     if (allGear) {
-//       response.status = 200;
-//       response.body = {
-//         success: true,
-//         data: allGear,
-//       };
-//     } else {
-//       response.status = 500;
-//       response.body = {
-//         success: false,
-//         msg: "Internal Server Error",
-//       };
-//     }
-//   } catch (err) {
-//     response.body = {
-//       success: false,
-//       msg: err.toString(),
-//     };
-//   }
-// };
-
-// client.close();
+export const constructQuery = <T>(filter: T, limit?: number): Query<T> => {
+  return {
+    collection: COLLECTION,
+    database: DATABASE,
+    dataSource: DATA_SOURCE,
+    filter,
+    limit,
+  };
+};

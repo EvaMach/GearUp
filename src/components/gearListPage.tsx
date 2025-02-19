@@ -136,7 +136,6 @@ const GearListPage = (): JSX.Element => {
         gear={groupedGearList}
         onItemRemoved={handleItemRemoved}
         onItemAdded={handleItemAdded}
-        selectOptions={selectOptions}
         onItemCreated={handleNewItemCreated}
       />
     </>

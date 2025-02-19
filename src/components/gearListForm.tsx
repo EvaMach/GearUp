@@ -1,6 +1,6 @@
 import { SingleValue } from 'react-select';
 import { useCallback, useState } from 'react';
-import { fetchGearOptions, GearItem, GearList, GroupedGearList } from '../api/gear';
+import { fetchGearOptions, GearItem, GroupedGearList } from '../api/gear';
 import FormSectionHead from './formSectionHead';
 import { debounce } from "lodash";
 import ListItem from './listItem';
@@ -21,10 +21,9 @@ interface Props {
   onItemRemoved: (group: string, itemName: string) => void;
   onItemAdded: (value: SingleValue<SelectOption>) => void;
   onItemCreated: (value: string, group: string) => void;
-  selectOptions: GearList;
 }
 
-const GearListForm = ({ gear, onItemRemoved, onItemAdded, selectOptions, onItemCreated }: Props): JSX.Element => {
+const GearListForm = ({ gear, onItemRemoved, onItemAdded, onItemCreated }: Props): JSX.Element => {
   const [groupWhereAlreaady, setGroupWhereAlready] = useState<string | null>(
     null
   );
