@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 export interface TripDetails {
   stayLength: number;
   type: 'tent' | 'hotel';
+  timestamp: string;
 }
 
 const TripDetailsForm = (): JSX.Element => {
@@ -18,10 +19,8 @@ const TripDetailsForm = (): JSX.Element => {
     },
   });
 
-
   const onSubmit = (formValues: TripDetails): void => {
-    console.log(formValues);
-    navigate('/gear-list', { state: formValues });
+    navigate('/gear-list', { state: { ...formValues, timestamp: Date.now().toString() } });
   };
 
   return (

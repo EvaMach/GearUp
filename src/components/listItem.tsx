@@ -3,7 +3,6 @@ import {
   CheckedIcon,
   MinusIcon,
   PlusIcon,
-  ShopIcon,
   UncheckedIcon,
 } from '../libs/icons/icons';
 import IconButton from './iconButton';
@@ -25,8 +24,8 @@ const ListItem = ({ group, name, count, onRemove }: Props): JSX.Element => {
   };
 
   const changeItemCount = (operation?: 'plus' | 'minus'): void => {
-    if (itemCount === 0 && operation === 'minus') {
-      return;
+    if (itemCount === 1 && operation === 'minus') {
+      onRemove(group, name);
     }
     if (itemCount === 99 && operation === 'plus') {
       return;
@@ -70,12 +69,9 @@ const ListItem = ({ group, name, count, onRemove }: Props): JSX.Element => {
             {name}
           </p>
         </div>
-        <IconButton onClick={removeItem}>
-          <BinIcon className="fill-gray-300 w-4 hover:fill-primary" />
-        </IconButton>
       </button>
       <IconButton onClick={removeItem}>
-        <ShopIcon className="fill-textColor w-5 hover:fill-accent" />
+        <BinIcon className="fill-gray-300 w-4 hover:fill-primary" />
       </IconButton>
     </div >
   );

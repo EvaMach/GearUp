@@ -1,76 +1,45 @@
-import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 
-const { APP_ID, DATA_API_KEY } = await load();
-
-const BASE_URI = `https://eu-central-1.aws.data.mongodb-api.com/app/${APP_ID}/endpoint/data/v1/action`;
-
-const DATA_SOURCE = "Cluster0";
-const DATABASE = "gearup_db";
-const COLLECTION = "gear";
-
-const options = {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "api-key": DATA_API_KEY
-  },
-  body: ""
-};
+import type { Context, Response } from "https://deno.land/x/oak@v16.0.0/mod.ts";
+import { constructQuery, BASE_URI, type Query, MONGO_HEADERS } from "./db.ts";
+import { fetchData } from "./utils.ts";
 
 interface GearItem {
   _id: { $oid: string; };
   name: string;
   type: 'tent' | 'hotel' | 'all';
+  group: string;
   amount: number;
 }
-
-interface SuccessResponse<T> {
-  success: true;
-  data: {
-    documents: T;
-  };
-}
-
-interface ErrorResponse {
-  success: false;
-  msg: string;
-}
-
-interface ApiResponse<T> {
-  status: number;
-  body: SuccessResponse<T> | ErrorResponse;
-}
-
-export const getGear = async ({ response }: { response: ApiResponse<GearItem[]>; }) => {
+export const errorHandler = async (ctx: Context, next: () => Promise<unknown>) => {
   try {
-    const URI = `${BASE_URI}/find`;
-    const query = {
-      collection: COLLECTION,
-      database: DATABASE,
-      dataSource: DATA_SOURCE
-    };
-    options.body = JSON.stringify(query);
-    const dataResponse = await fetch(URI, options);
-    const data = await dataResponse.json();
-    console.log(data);
-
-    if (data) {
-      response.status = 200;
-      response.body = {
-        success: true,
-        data: data,
-      };
-    } else {
-      response.status = 500;
-      response.body = {
-        success: false,
-        msg: "Internal Server Error",
-      };
-    }
+    await next();
   } catch (err) {
-    response.body = {
-      success: false,
-      msg: err.toString(),
-    };
+    ctx.response.status = 500;
+    ctx.response.body = { success: false, error: "Internal Server Error: " + err };
   }
+};
+
+const fetchDocuments = async <T>(query: Query<T>, response: Response): Promise<void> => {
+  const body = JSON.stringify(query);
+  const result = await fetchData<GearItem[]>(`${BASE_URI}/find`, 'POST', MONGO_HEADERS, body);
+
+  if (result.success) {
+    response.status = result.status;
+    response.body = result.data;
+  } else {
+    response.status = result.status;
+    response.body = result.error;
+  };
+};
+
+export const getGearList = async ({ response, request }: Context) => {
+  const typeParam = request.url.searchParams.get('type');
+  const query = constructQuery(typeParam ? { "type": { $in: [typeParam, "all"] } } : {});
+  await fetchDocuments(query, response);
+};
+
+export const getOptions = async ({ response, request }: Context) => {
+  const searchQuery = request.url.searchParams.get("q") || "";
+  const query = constructQuery({ name: { $regex: searchQuery, $options: "i" } });
+  await fetchDocuments(query, response);
 };
