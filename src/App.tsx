@@ -5,8 +5,8 @@ const App = (): JSX.Element => {
   return (
     <>
       <div>
-        <Header />
-        <div className="mx-6 flex flex-col justify-center">
+        <Header />;
+        <div className="mx-3 sm:mx-6 flex flex-col justify-center">
           <Outlet />
         </div>
       </div>
