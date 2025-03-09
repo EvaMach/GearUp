@@ -1,21 +1,21 @@
 
 import type { Context, Response } from "https://deno.land/x/oak@v16.0.0/mod.ts";
 import { constructQuery, BASE_URI, type Query, MONGO_HEADERS } from "./db.ts";
-import { fetchData } from "../sharedUtils/apiUtils.ts";
+import { fetchData } from "./utils.ts";
 
 interface GearItem {
   _id: { $oid: string; };
   name: string;
   type: 'tent' | 'hotel' | 'all';
+  group: string;
   amount: number;
 }
 export const errorHandler = async (ctx: Context, next: () => Promise<unknown>) => {
   try {
     await next();
   } catch (err) {
-    console.error("Unhandled Error:", err);
     ctx.response.status = 500;
-    ctx.response.body = { success: false, error: "Internal Server Error" };
+    ctx.response.body = { success: false, error: "Internal Server Error: " + err };
   }
 };
 

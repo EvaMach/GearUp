@@ -24,17 +24,12 @@ export const fetchData = async <T>(
   headers: Record<string, string> = {},
   body: string = ''
 ): Promise<Result<T>> => {
-  const baseHeaders = {
-    "Content-Type": "application/json",
-  };
   try {
-    const response = await fetch(URI, {
-      method, headers: { ...baseHeaders, ...headers }, body
-    });
+    const response = await fetch(URI, { method, headers, body });
 
     if (response.ok) {
       const payload = await response.json();
-      return success(payload, response.status);
+      return success(payload.documents, response.status);
     }
 
     try {
