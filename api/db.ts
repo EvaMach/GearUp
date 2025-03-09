@@ -6,15 +6,6 @@ const DATA_SOURCE = "Cluster0";
 const DATABASE = "gearup_db";
 const COLLECTION = "gear";
 
-export const DB_OPTIONS = {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "api-key": DATA_API_KEY,
-  },
-  body: ""
-};
-
 export interface Query<T> {
   collection: string;
   database: string;
@@ -22,6 +13,11 @@ export interface Query<T> {
   filter: T;
   limit?: number;
 }
+
+export const MONGO_HEADERS = {
+  "Content-Type": "application/json",
+  "api-key": DATA_API_KEY
+};
 
 export const constructQuery = <T>(filter: T, limit?: number): Query<T> => {
   return {

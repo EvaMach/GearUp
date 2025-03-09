@@ -1,5 +1,3 @@
-import { BASE_URI, DB_OPTIONS } from "../api/db";
-
 interface SuccessResult<T> {
   success: true;
   status: number;
@@ -30,7 +28,9 @@ export const fetchData = async <T>(
     "Content-Type": "application/json",
   };
   try {
-    const response = await fetch(URI, { method, headers: { ...baseHeaders, ...headers }, body });
+    const response = await fetch(URI, {
+      method, headers: { ...baseHeaders, ...headers }, body
+    });
 
     if (response.ok) {
       const payload = await response.json();
