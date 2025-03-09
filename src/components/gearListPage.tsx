@@ -2,7 +2,7 @@ import { fetchGearList, GearItem, GearList, GroupedGearList } from "../api/gear"
 import { useLocation } from "react-router";
 import { TripDetails } from "./tripDetailsForm";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SingleValue } from "react-select";
 import GearListForm from "./gearListForm";
 import TripDetailsBoard from "./tripDetails";
@@ -23,38 +23,10 @@ const GearListPage = (): JSX.Element => {
 
   const { isPending, data: gearList, isError } = useQuery({
     queryKey: ['gear', tripDetails.type],
-    queryFn: ({ queryKey }) => {
-      const [, type] = queryKey;
-      return fetchGearList(type);
-    },
+    queryFn: () => fetchGearList(tripDetails.type),
   });
 
-  const [groupedGearList, setGroupedGearList] = useState<GroupedGearList>({});
   const [selectOptions, setSelectOptions] = useState<GearList>([]);
-
-  useEffect(() => {
-    if (gearList === undefined) {
-      return;
-    }
-    const groupedList = gearList.reduce((acc: { [key: string]: GearList; }, item) => {
-      if (acc[item.group] === undefined) {
-        acc[item.group] = [];
-      }
-      acc[item.group].push(item);
-      return acc;
-    }, {});
-    setGroupedGearList(groupedList);
-  }, [gearList]);
-
-
-  if (isPending) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error</div>;
-  }
-
 
   const handleItemRemoved = (group: string, itemName: string): void => {
     // const updatedData = groupedGearList.map((gear) => {
@@ -132,12 +104,18 @@ const GearListPage = (): JSX.Element => {
   return (
     <>
       <TripDetailsBoard details={tripDetails} />
-      <GearListForm
-        gear={groupedGearList}
-        onItemRemoved={handleItemRemoved}
-        onItemAdded={handleItemAdded}
-        onItemCreated={handleNewItemCreated}
-      />
+      {isPending && <div>Loading...</div>}
+      {isError && <div>Error</div>}
+      {gearList && (
+        <>
+          <GearListForm
+            gear={gearList}
+            onItemRemoved={handleItemRemoved}
+            onItemAdded={handleItemAdded}
+            onItemCreated={handleNewItemCreated}
+          />
+        </>
+      )}
     </>
   );
 };
