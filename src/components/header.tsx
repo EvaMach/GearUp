@@ -7,7 +7,7 @@ const Header = (): JSX.Element => {
         <img src={logo} alt="Mountain logo" />
       </div>
       <h1 className="mb-5 text-center">
-        Sbal se na další výlet rychle a bez stresu!
+        Sbal se rychle a bez stresu
       </h1>
     </>
   );

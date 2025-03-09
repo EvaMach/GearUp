@@ -1,7 +1,6 @@
 import { SingleValue } from 'react-select';
 import { useCallback, useEffect, useState } from 'react';
-import { fetchGearList, fetchGearSuggestions, GearItem, GroupedGearList } from '../api/gear';
-import FormSectionHead from './formSectionHead';
+import { fetchGearList, fetchGearSuggestions, GearItem, GroupedGearList, PackedGroupedGearList } from '../api/gear';
 import { debounce } from "lodash";
 import ListItem from './listItem';
 import AsyncCreatableSelect from 'react-select/async-creatable';
@@ -9,7 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TripDetails } from './tripDetailsForm';
 
 interface LocalData {
-  data: GroupedGearList;
+  data: PackedGroupedGearList;
   timestamp: string;
 }
 
@@ -56,7 +55,7 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
   });
 
   useEffect(() => {
-    if (gear === undefined) {
+    if (gear !== undefined) {
       localStorage.setItem('gearList', JSON.stringify({ timestamp: tripDetails.timestamp, data: gear }));
     }
   }, [gear]);
@@ -144,50 +143,52 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <FormSectionHead count={3} title="Balící seznam" />;
+    <>
       {isPending && <div className="flex flex-col items-center justify-center bg-white p-4 rounded-lg">Načítám seznam... </div>}
       {isError && <div className="flex flex-col items-center justify-center bg-white p-4 rounded-lg">Nastala chyba.</div>}
       {
         gear !== undefined && (
-          <div className="flex lg:flex-row max-w-full overflox-auto max-h-screen/4 flex-col gap-2 lg:gap-8 p-2 rounded-lg overflow-x-scroll">
-            {Object.keys(gear).map((group, index) => (
-              <div className="flex max-h-screen min-w-fit overflow-y-auto flex-col gap-2 bg-white p-4 rounded-lg" key={index}>
-                <h3 className="font-medium">{group}</h3>
-                {gear[group].map((dataItem) => (
-                  <ListItem
-                    key={dataItem.name}
-                    group={group}
-                    name={dataItem.name}
-                    count={dataItem.amount === 0 ? 1 : dataItem.amount}
-                    onRemove={removeItem}
-                  />
-                ))}
-                <div className="flex flex-col items-center ml-12">
-                  <AsyncCreatableSelect
-                    menuPlacement="auto"
-                    className="gear-select"
-                    classNamePrefix={'gear-select'}
-                    key={group + 'select'}
-                    controlShouldRenderValue={false}
-                    placeholder="Vybrat"
-                    closeMenuOnSelect
-                    onCreateOption={(inputValue) => createItem(inputValue, group)}
-                    formatCreateLabel={createNewOption}
-                    onChange={addItem}
-                    loadOptions={debouncedLoadOptions}
-                  />
-                  {groupWhereAlreaady === group && (
-                    <p className="bg-primary/30 rounded w-1/2 lg:min-w-15 text-center">
-                      Gear už je na seznamu.
-                    </p>
-                  )}
+          <div className="flex flex-col gap-2 bg-white/60 p-8 rounded-xl">
+            <div className="flex lg:flex-row max-h-screen/4 max-w-screen-lg flex-col gap-2 lg:gap-8 rounded-lg overflow-x-auto">
+              {Object.keys(gear).map((group, index) => (
+                <div className="flex max-h-screen min-w-fit overflow-y-auto flex-col gap-2 bg-white p-4 rounded-lg" key={index}>
+                  <h3 className="font-medium">{group}</h3>
+                  {gear[group].map((dataItem) => (
+                    <ListItem
+                      key={dataItem.name}
+                      group={group}
+                      name={dataItem.name}
+                      count={dataItem.amount === 0 ? 1 : dataItem.amount}
+                      onRemove={removeItem}
+                    />
+                  ))}
+                  <div className="flex flex-col items-center ml-12">
+                    <AsyncCreatableSelect
+                      menuPlacement="auto"
+                      className="gear-select"
+                      classNamePrefix={'gear-select'}
+                      key={group + 'select'}
+                      controlShouldRenderValue={false}
+                      placeholder="Vybrat"
+                      closeMenuOnSelect
+                      onCreateOption={(inputValue) => createItem(inputValue, group)}
+                      formatCreateLabel={createNewOption}
+                      onChange={addItem}
+                      loadOptions={debouncedLoadOptions}
+                    />
+                    {groupWhereAlreaady === group && (
+                      <p className="bg-primary/30 rounded w-1/2 lg:min-w-15 text-center">
+                        Gear už je na seznamu.
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        )}
-    </div>
+        )
+      }
+    </>
   );
 };
 

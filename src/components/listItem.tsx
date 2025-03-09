@@ -42,13 +42,13 @@ const ListItem = ({ group, name, count, onRemove }: Props): JSX.Element => {
       <div className="flex items-center gap-0.5">
         <div className='p-2'>{itemCount}</div>
         <IconButton
-          className="bg-bgDark p-1 h-6 aspect-square rounded-full flex items-center justify-center"
+          className="bg-primaryHighlight p-1 h-6 aspect-square rounded-full flex items-center justify-center"
           onClick={(): void => changeItemCount('plus')}
         >
           <PlusIcon className="fill-textColor w-2" />
         </IconButton>
         <IconButton
-          className="bg-bgDark p-1 h-6 aspect-square rounded-full flex items-center justify-center"
+          className="bg-primaryHighlight p-1 h-6 aspect-square rounded-full flex items-center justify-center"
           onClick={(): void => changeItemCount('minus')}
         >
           <MinusIcon className="fill-textColor w-2" />
@@ -64,12 +64,12 @@ const ListItem = ({ group, name, count, onRemove }: Props): JSX.Element => {
         ) : (
           <UncheckedIcon className="w-4" />
         )}
-        <div className="text-left overflow-auto">
+        <div className="text-left">
           {name}
         </div>
       </button>
       <IconButton onClick={removeItem}>
-        <BinIcon className="fill-gray-300 w-4 hover:fill-primary" />
+        <BinIcon className="fill-gray-300 w-4 hover:fill-accent" />
       </IconButton>
     </div >
   );

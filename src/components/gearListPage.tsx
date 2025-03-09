@@ -8,12 +8,12 @@ const GearListPage = (): JSX.Element => {
   const tripDetails = location.state as TripDetails;
 
   return (
-    <>
+    <div className="flex flex-col items-center gap-6">
       <TripDetailsBoard details={tripDetails} />
       <GearListForm
         tripDetails={tripDetails}
       />
-    </>
+    </div>
   );
 };
 

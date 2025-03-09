@@ -5,7 +5,7 @@ const App = (): JSX.Element => {
   return (
     <>
       <div>
-        <Header />;
+        <Header />
         <div className="mx-3 sm:mx-6 flex flex-col justify-center">
           <Outlet />
         </div>
