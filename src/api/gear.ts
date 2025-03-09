@@ -1,6 +1,7 @@
 const API_BASE_URL = 'http://localhost:8000/api';
 
 export interface GearItem {
+  _id?: string;
   name: string;
   group: string;
   type: 'tent' | 'hotel' | 'all';
@@ -19,10 +20,10 @@ export interface GroupedGearList {
 
 const groupGearList = (gearList: GearList): GroupedGearList => {
   return gearList.reduce((acc: GroupedGearList, item) => {
-    if (acc[item.group] === undefined) {
-      return { ...acc, [item.group]: [] };
-    }
-    return { ...acc, [item.group]: acc[item.group] };
+    return {
+      ...acc,
+      [item.group]: [...(acc[item.group] ?? []), item]
+    };
   }, {});
 };
 
@@ -32,11 +33,7 @@ export const fetchGearList = async (type: string): Promise<GroupedGearList> => {
   return groupGearList(data);
 };
 
-export const fetchGearOptions = async (input: string): Promise<GearList> => {
+export const fetchGearSuggestions = async (input: string): Promise<GearList> => {
   const response = await fetch(`${API_BASE_URL}/options?q=${input}`);
-  console.log(response);
-  const json = await response.json();
-  return json.data;
-}
-
-
+  return await response.json();
+};
