@@ -13,11 +13,12 @@ interface Props {
   group: string;
   count: number;
   onRemove: (group: string, item: string) => void;
+  onCheck: (group: string, item: string) => void;
+  checked: boolean;
 }
 
-const ListItem = ({ group, name, count, onRemove }: Props): JSX.Element => {
+const ListItem = ({ group, name, count, onRemove, onCheck, checked }: Props): JSX.Element => {
   const [itemCount, setItemCount] = useState(count);
-  const [checked, setChecked] = useState(false);
 
   const removeItem = (): void => {
     onRemove(group, name);
@@ -56,7 +57,7 @@ const ListItem = ({ group, name, count, onRemove }: Props): JSX.Element => {
       </div>
       <button
         type="button"
-        onClick={(): void => setChecked(!checked)}
+        onClick={(): void => onCheck(group, name)}
         className="grid grid-cols-[2rem_minmax(6rem,_1fr)_2rem] border-2 min-w-5 lg:min-w-15 justify-between items-center p-1 min-h-min rounded-lg px-2 w-48"
       >
         {checked ? (

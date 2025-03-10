@@ -7,8 +7,8 @@ export interface GearItem {
   type: 'tent' | 'hotel' | 'all';
   amount: number;
 }
-
-export interface PackedGearItem extends GearItem {
+;
+export interface GearItemToPack extends GearItem {
   packed: boolean;
 }
 
@@ -18,8 +18,12 @@ export interface GroupedGearList {
   [group: string]: GearList;
 }
 
-const groupGearList = (gearList: GearList): GroupedGearList => {
-  return gearList.reduce((acc: GroupedGearList, item) => {
+export interface GroupedGearListToPack {
+  [group: string]: GearItemToPack[];
+}
+
+const groupAndMarkList = (gearList: GearItemToPack[]): GroupedGearListToPack => {
+  return gearList.reduce((acc: GroupedGearListToPack, item) => {
     return {
       ...acc,
       [item.group]: [...(acc[item.group] ?? []), item]
@@ -27,10 +31,11 @@ const groupGearList = (gearList: GearList): GroupedGearList => {
   }, {});
 };
 
-export const fetchGearList = async (type: string): Promise<GroupedGearList> => {
+export const fetchGearList = async (type: string): Promise<GroupedGearListToPack> => {
   const response = await fetch(`${API_BASE_URL}/gear?type=${type}`);
   const data: GearList = await response.json();
-  return groupGearList(data);
+  const dataWithPackedInfo: GearItemToPack[] = data.map((item) => ({ ...item, packed: false }));
+  return groupAndMarkList(dataWithPackedInfo);
 };
 
 export const fetchGearSuggestions = async (input: string): Promise<GearList> => {

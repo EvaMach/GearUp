@@ -1,6 +1,6 @@
 import { SingleValue } from 'react-select';
 import { useCallback, useEffect, useState } from 'react';
-import { fetchGearList, fetchGearSuggestions, GearItem, GroupedGearList, PackedGroupedGearList } from '../api/gear';
+import { fetchGearList, fetchGearSuggestions, GearItemToPack, GroupedGearListToPack } from '../api/gear';
 import { debounce } from "lodash";
 import ListItem from './listItem';
 import AsyncCreatableSelect from 'react-select/async-creatable';
@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TripDetails } from './tripDetailsForm';
 
 interface LocalData {
-  data: PackedGroupedGearList;
+  data: GroupedGearListToPack;
   timestamp: string;
 }
 
@@ -21,7 +21,7 @@ const retrieveLocalData = (): LocalData | null => {
 };
 
 interface OptionValue {
-  item: GearItem;
+  item: GearItemToPack;
   group: string;
 }
 
@@ -40,7 +40,7 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
     null
   );
 
-  const fetchData = (): Promise<GroupedGearList> => {
+  const fetchData = (): Promise<GroupedGearListToPack> => {
     const localData = retrieveLocalData();
     if (tripDetails.timestamp !== undefined && tripDetails.timestamp === localData?.timestamp) {
       return Promise.resolve(localData.data);
@@ -94,7 +94,7 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
     </button>
   );
 
-  const updateGearList = (newList: GroupedGearList): void => {
+  const updateGearList = (newList: GroupedGearListToPack): void => {
     localStorage.setItem('gearList', JSON.stringify({ timestamp: tripDetails.timestamp, data: newList }));
     queryClient.setQueryData(['gear', tripDetails.type], newList);
   };
@@ -132,14 +132,26 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
       setGroupWhereAlready(group);
       return;
     }
-    const newItem: GearItem = {
+    const newItem: GearItemToPack = {
       name: inputValue,
       group: group,
       type: tripDetails.type,
       amount: 1,
+      packed: false,
     };
     const updatedData = { ...gear, [group]: [...gear[group], newItem] };
     updateGearList(updatedData);
+  };
+
+  const handleItemChecked = (group: string, item: string): void => {
+    if (gear === undefined) {
+      return;
+    }
+    const updatedGear = {
+      ...gear, [group]: gear[group].map(
+        (gearItem) => (gearItem.name === item ? { ...gearItem, packed: true } : gearItem))
+    };
+    updateGearList(updatedGear);
   };
 
   return (
@@ -158,8 +170,10 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
                       key={dataItem.name}
                       group={group}
                       name={dataItem.name}
+                      checked={dataItem.packed}
                       count={dataItem.amount === 0 ? 1 : dataItem.amount}
                       onRemove={removeItem}
+                      onCheck={handleItemChecked}
                     />
                   ))}
                   <div className="flex flex-col items-center ml-12">
