@@ -41,7 +41,7 @@ const ListItem = ({ group, name, count, onRemove, onCheck, checked }: Props): JS
   return (
     <div className="flex gap-2 justify-center">
       <div className="flex items-center gap-0.5">
-        <div className='p-2'>{itemCount}</div>
+        <div className='p-2'>{Math.ceil(itemCount)}</div>
         <IconButton
           className="bg-primaryHighlight p-1 h-6 aspect-square rounded-full flex items-center justify-center"
           onClick={(): void => changeItemCount('plus')}

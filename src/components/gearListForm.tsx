@@ -160,8 +160,8 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
       {isError && <div className="flex flex-col items-center justify-center bg-white p-4 rounded-lg">Nastala chyba.</div>}
       {
         gear !== undefined && (
-          <div className="flex flex-col gap-2 bg-white/60 p-8 rounded-xl">
-            <div className="flex lg:flex-row max-h-screen/4 max-w-screen-lg flex-col gap-2 lg:gap-8 rounded-lg overflow-x-auto">
+          <div className="flex flex-col gap-2 bg-white/60 p-8 rounded-xl w-full">
+            <div className="flex lg:flex-row items-start max-h-screen/4 w-full flex-col gap-2 lg:gap-8 rounded-lg overflow-x-auto">
               {Object.keys(gear).map((group, index) => (
                 <div className="flex max-h-screen min-w-fit overflow-y-auto flex-col gap-2 bg-white p-4 rounded-lg" key={index}>
                   <h3 className="font-medium">{group}</h3>
