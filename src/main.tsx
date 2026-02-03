@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import './global.css';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
 import HomePage from './components/homePage';
 import GearListPage from './components/gearListPage';
 
-const queryClient = new QueryClient();
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
 const router = createBrowserRouter([
   {
@@ -16,20 +16,20 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <HomePage />
+        element: <HomePage />,
       },
       {
         path: '/gear-list',
-        element: <GearListPage />
-      }
-    ]
+        element: <GearListPage />,
+      },
+    ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <ConvexProvider client={convex}>
       <RouterProvider router={router} />
-    </QueryClientProvider>
+    </ConvexProvider>
   </React.StrictMode>
 );

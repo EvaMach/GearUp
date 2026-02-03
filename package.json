@@ -5,15 +5,18 @@
   "type": "module",
   "scripts": {
     "build:vite": "vite build",
-    "build:api": "copyfiles api/* api/.env deno.* dist/",
     "dev": "vite",
-    "build": "tsc && npm run build:vite && npm run build:api",
+    "dev:convex": "convex dev",
+    "build": "npx convex codegen && tsc && && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predev": "convex dev --until-success",
+    "seed": "convex run seed:seedGear"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-query-devtools": "^5.0.3",
+    "convex": "^1.31.5",
     "json-server": "^0.17.4",
     "lodash": "^4.17.21",
     "react": "^18.2.0",

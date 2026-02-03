@@ -1,10 +1,16 @@
 import { SingleValue } from 'react-select';
-import { useCallback, useEffect, useState } from 'react';
-import { fetchGearList, fetchGearSuggestions, GearItemToPack, GroupedGearListToPack } from '../api/gear';
-import { debounce } from "lodash";
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import {
+  GearItemToPack,
+  GroupedGearListToPack,
+  groupAndMarkList,
+} from '../api/gear';
+import { useGearSearch } from '../api/useGearSearch';
+import { debounce } from 'lodash';
 import ListItem from './listItem';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { TripDetails } from './tripDetailsForm';
 
 interface LocalData {
@@ -35,41 +41,60 @@ interface Props {
 }
 
 const GearListForm = ({ tripDetails }: Props): JSX.Element => {
-  const queryClient = useQueryClient();
+  const { searchGear } = useGearSearch();
   const [groupWhereAlreaady, setGroupWhereAlready] = useState<string | null>(
     null
   );
+  const [gearList, setGearList] = useState<GroupedGearListToPack | undefined>(
+    undefined
+  );
 
-  const fetchData = (): Promise<GroupedGearListToPack> => {
-    const localData = retrieveLocalData();
-    if (tripDetails.timestamp !== undefined && tripDetails.timestamp === localData?.timestamp) {
-      return Promise.resolve(localData.data);
-    } else {
-      return fetchGearList(tripDetails.type);
-    }
-  };
-
-  const { isPending, data: gear, isError } = useQuery({
-    queryKey: ['gear', tripDetails.type],
-    queryFn: () => fetchData(),
+  const gearData = useQuery(api.gear.getGear, {
+    type: tripDetails.type as 'tent' | 'hotel' | undefined,
   });
+
+  const gear = useMemo(() => {
+    if (!gearData) {
+      return undefined;
+    }
+
+    const localData = retrieveLocalData();
+    if (
+      tripDetails.timestamp !== undefined &&
+      tripDetails.timestamp === localData?.timestamp
+    ) {
+      return localData.data;
+    }
+
+    return groupAndMarkList(gearData);
+  }, [gearData, tripDetails.timestamp]);
+
+  const isPending = gearData === undefined;
 
   useEffect(() => {
     if (gear !== undefined) {
-      localStorage.setItem('gearList', JSON.stringify({ timestamp: tripDetails.timestamp, data: gear }));
+      setGearList(gear);
     }
   }, [gear]);
 
+  useEffect(() => {
+    if (gearList !== undefined) {
+      localStorage.setItem(
+        'gearList',
+        JSON.stringify({ timestamp: tripDetails.timestamp, data: gearList })
+      );
+    }
+  }, [gearList, tripDetails.timestamp]);
+
   const fetchSuggestions = async (inputValue: string) => {
     try {
-      const suggestions = await fetchGearSuggestions(inputValue);
-      return (suggestions.map((item) => (
-        {
-          value: { item: item, group: item.group },
-          label: item.name,
-        })));
+      const suggestions = await searchGear(inputValue);
+      return suggestions.map((item) => ({
+        value: { item: { ...item, packed: false }, group: item.group },
+        label: item.name,
+      }));
     } catch (error) {
-      console.error("Error fetching options:", error);
+      console.error('Error fetching options:', error);
       return [];
     }
   };
@@ -86,46 +111,51 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
   );
 
   const createNewOption = (inputValue: string): JSX.Element => (
-    <button
-      className="hover:text-accent"
-      type="button"
-    >
+    <button className="hover:text-accent" type="button">
       + {inputValue}
     </button>
   );
 
   const updateGearList = (newList: GroupedGearListToPack): void => {
-    localStorage.setItem('gearList', JSON.stringify({ timestamp: tripDetails.timestamp, data: newList }));
-    queryClient.setQueryData(['gear', tripDetails.type], newList);
+    setGearList(newList);
+    // With Convex, we don't need to manually update the cache
+    // The data will be refetched automatically when needed
   };
 
   const removeItem = (group: string, itemName: string): void => {
-    if (gear === undefined) {
+    if (gearList === undefined) {
       return;
     }
-    const updatedGroup = gear[group].filter((item) => item.name !== itemName);
-    const updatedList = { ...gear, [group]: updatedGroup };
+    const updatedGroup = gearList[group].filter(
+      (item) => item.name !== itemName
+    );
+    const updatedList = { ...gearList, [group]: updatedGroup };
     updateGearList(updatedList);
   };
 
   const addItem = (selectedItem: SingleValue<SelectOption>): void => {
-    if (selectedItem === null || gear === undefined) {
+    if (selectedItem === null || gearList === undefined) {
       return;
     }
     const { value } = selectedItem;
-    const updatedGear = { ...gear, [value.group]: [...gear[value.group], value.item] };
+    const updatedGear = {
+      ...gearList,
+      [value.group]: [...gearList[value.group], value.item],
+    };
     updateGearList(updatedGear);
   };
 
   const isItemAlreadyOnList = (itemName: string): boolean => {
-    if (gear === undefined) {
+    if (gearList === undefined) {
       return false;
     }
-    return Object.values(gear).some((group) => group.some((item) => item.name === itemName));
+    return Object.values(gearList).some((group) =>
+      group.some((item) => item.name === itemName)
+    );
   };
 
   const createItem = (inputValue: string, group: string): void => {
-    if (gear === undefined) {
+    if (gearList === undefined) {
       return;
     }
     if (isItemAlreadyOnList(inputValue)) {
@@ -139,69 +169,77 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
       amount: 1,
       packed: false,
     };
-    const updatedData = { ...gear, [group]: [...gear[group], newItem] };
+    const updatedData = { ...gearList, [group]: [...gearList[group], newItem] };
     updateGearList(updatedData);
   };
 
   const handleItemChecked = (group: string, item: string): void => {
-    if (gear === undefined) {
+    if (gearList === undefined) {
       return;
     }
     const updatedGear = {
-      ...gear, [group]: gear[group].map(
-        (gearItem) => (gearItem.name === item ? { ...gearItem, packed: true } : gearItem))
+      ...gearList,
+      [group]: gearList[group].map((gearItem) =>
+        gearItem.name === item ? { ...gearItem, packed: true } : gearItem
+      ),
     };
     updateGearList(updatedGear);
   };
 
   return (
     <>
-      {isPending && <div className="flex flex-col items-center justify-center bg-white p-4 rounded-lg">Načítám seznam... </div>}
-      {isError && <div className="flex flex-col items-center justify-center bg-white p-4 rounded-lg">Nastala chyba.</div>}
-      {
-        gear !== undefined && (
-          <div className="flex flex-col gap-2 bg-white/60 p-8 rounded-xl w-full">
-            <div className="flex lg:flex-row items-start max-h-screen/4 w-full flex-col gap-2 lg:gap-8 rounded-lg overflow-x-auto">
-              {Object.keys(gear).map((group, index) => (
-                <div className="flex max-h-screen min-w-fit overflow-y-auto flex-col gap-2 bg-white p-4 rounded-lg" key={index}>
-                  <h3 className="font-medium">{group}</h3>
-                  {gear[group].map((dataItem) => (
-                    <ListItem
-                      key={dataItem.name}
-                      group={group}
-                      name={dataItem.name}
-                      checked={dataItem.packed}
-                      count={dataItem.amount === 0 ? 1 : dataItem.amount}
-                      onRemove={removeItem}
-                      onCheck={handleItemChecked}
-                    />
-                  ))}
-                  <div className="flex flex-col items-center ml-12">
-                    <AsyncCreatableSelect
-                      menuPlacement="auto"
-                      className="gear-select"
-                      classNamePrefix={'gear-select'}
-                      key={group + 'select'}
-                      controlShouldRenderValue={false}
-                      placeholder="Vybrat"
-                      closeMenuOnSelect
-                      onCreateOption={(inputValue) => createItem(inputValue, group)}
-                      formatCreateLabel={createNewOption}
-                      onChange={addItem}
-                      loadOptions={debouncedLoadOptions}
-                    />
-                    {groupWhereAlreaady === group && (
-                      <p className="bg-primary/30 rounded w-1/2 lg:min-w-15 text-center">
-                        Gear už je na seznamu.
-                      </p>
-                    )}
-                  </div>
+      {isPending && (
+        <div className="flex flex-col items-center justify-center bg-white p-4 rounded-lg">
+          Načítám seznam...{' '}
+        </div>
+      )}
+      {gearList !== undefined && (
+        <div className="flex flex-col gap-2 bg-white/60 p-8 rounded-xl w-full">
+          <div className="flex lg:flex-row items-start max-h-screen/4 w-full flex-col gap-2 lg:gap-8 rounded-lg overflow-x-auto">
+            {Object.keys(gearList).map((group, index) => (
+              <div
+                className="flex max-h-screen min-w-fit overflow-y-auto flex-col gap-2 bg-white p-4 rounded-lg"
+                key={index}
+              >
+                <h3 className="font-medium">{group}</h3>
+                {gearList[group].map((dataItem) => (
+                  <ListItem
+                    key={dataItem.name}
+                    group={group}
+                    name={dataItem.name}
+                    checked={dataItem.packed}
+                    count={dataItem.amount === 0 ? 1 : dataItem.amount}
+                    onRemove={removeItem}
+                    onCheck={handleItemChecked}
+                  />
+                ))}
+                <div className="flex flex-col items-center ml-12">
+                  <AsyncCreatableSelect
+                    menuPlacement="auto"
+                    className="gear-select"
+                    classNamePrefix={'gear-select'}
+                    key={group + 'select'}
+                    controlShouldRenderValue={false}
+                    placeholder="Vybrat"
+                    closeMenuOnSelect
+                    onCreateOption={(inputValue) =>
+                      createItem(inputValue, group)
+                    }
+                    formatCreateLabel={createNewOption}
+                    onChange={addItem}
+                    loadOptions={debouncedLoadOptions}
+                  />
+                  {groupWhereAlreaady === group && (
+                    <p className="bg-primary/30 rounded w-1/2 lg:min-w-15 text-center">
+                      Gear už je na seznamu.
+                    </p>
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )
-      }
+        </div>
+      )}
     </>
   );
 };

@@ -8,7 +8,12 @@ dist
 dist-ssr
 *.local
 .env
+.env.local
 api/.env
 .vscode
+
+# Convex
+convex/_generated
+.convex
 
 
