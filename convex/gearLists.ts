@@ -65,8 +65,8 @@ export const getGearListWithItems = query({
     }
 
     // Verify ownership
-    const listUser = await ctx.db.get(gearList.userId);
-    if (listUser?.clerkId !== user.clerkId) {
+    // Ownership check
+    if (gearList.userId !== user._id) {
       throw new ConvexError('Unauthorized: You do not own this gear list');
     }
 
@@ -112,8 +112,7 @@ export const createGearList = mutation({
         throw new ConvexError('Trip not found');
       }
 
-      const tripUser = await ctx.db.get(trip.userId);
-      if (tripUser?.clerkId !== user.clerkId) {
+      if (trip.userId !== user._id) {
         throw new ConvexError('Unauthorized: You do not own this trip');
       }
     }
@@ -150,8 +149,8 @@ export const addItemToGearList = mutation({
     }
 
     // Verify ownership
-    const listUser = await ctx.db.get(gearList.userId);
-    if (listUser?.clerkId !== user.clerkId) {
+    // Ownership check
+    if (gearList.userId !== user._id) {
       throw new ConvexError('Unauthorized: You do not own this gear list');
     }
 
@@ -215,8 +214,8 @@ export const toggleItemPacked = mutation({
     }
 
     // Verify ownership
-    const listUser = await ctx.db.get(gearList.userId);
-    if (listUser?.clerkId !== user.clerkId) {
+    // Ownership check
+    if (gearList.userId !== user._id) {
       throw new ConvexError('Unauthorized');
     }
 
@@ -249,8 +248,8 @@ export const removeItemFromGearList = mutation({
     }
 
     // Verify ownership
-    const listUser = await ctx.db.get(gearList.userId);
-    if (listUser?.clerkId !== user.clerkId) {
+    // Ownership check
+    if (gearList.userId !== user._id) {
       throw new ConvexError('Unauthorized');
     }
 
@@ -281,8 +280,8 @@ export const deleteGearList = mutation({
     }
 
     // Verify ownership
-    const listUser = await ctx.db.get(gearList.userId);
-    if (listUser?.clerkId !== user.clerkId) {
+    // Ownership check
+    if (gearList.userId !== user._id) {
       throw new ConvexError('Unauthorized: You do not own this gear list');
     }
 

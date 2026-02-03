@@ -103,12 +103,21 @@ export const updateTrip = mutation({
     }
 
     // Verify ownership
-    const tripUser = await ctx.db.get(trip.userId);
-    if (tripUser?.clerkId !== user.clerkId) {
+    if (trip.userId !== user._id) {
       throw new ConvexError('Unauthorized: You do not own this trip');
     }
 
-    const updates: any = { updatedAt: Date.now() };
+    // Build updates object with proper typing
+    const updates: {
+      updatedAt: number;
+      name?: string;
+      type?: 'tent' | 'hotel';
+      startDate?: number;
+      endDate?: number;
+      location?: string;
+      notes?: string;
+      status?: 'planning' | 'packed' | 'ongoing' | 'completed';
+    } = { updatedAt: Date.now() };
     if (args.name !== undefined) updates.name = args.name;
     if (args.type !== undefined) updates.type = args.type;
     if (args.startDate !== undefined) updates.startDate = args.startDate;
@@ -139,8 +148,7 @@ export const deleteTrip = mutation({
     }
 
     // Verify ownership
-    const tripUser = await ctx.db.get(trip.userId);
-    if (tripUser?.clerkId !== user.clerkId) {
+    if (trip.userId !== user._id) {
       throw new ConvexError('Unauthorized: You do not own this trip');
     }
 

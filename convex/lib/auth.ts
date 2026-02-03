@@ -52,17 +52,16 @@ export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
 }
 
 /**
- * Verify user owns a resource
+ * Verify user owns a resource by comparing user IDs
  */
 export async function verifyOwnership(
   ctx: QueryCtx | MutationCtx,
-  resourceUserId: string,
+  resourceUserId: string | undefined,
   resourceType: string
 ): Promise<void> {
   const user = await getCurrentUser(ctx);
 
-  const resourceUser = await ctx.db.get(resourceUserId as any);
-  if (!resourceUser || resourceUser.clerkId !== user?.clerkId) {
+  if (!resourceUserId || resourceUserId !== user?._id) {
     throw new ConvexError(`Unauthorized: You don't own this ${resourceType}`);
   }
 }
