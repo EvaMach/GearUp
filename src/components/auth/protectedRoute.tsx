@@ -9,7 +9,6 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps): JSX.Element => {
   const { isLoaded, isSignedIn } = useAuth();
 
-  // Show loading state while auth is initializing
   if (!isLoaded) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -18,12 +17,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps): JSX.Element => {
     );
   }
 
-  // Redirect to sign-in if not authenticated
   if (!isSignedIn) {
     return <Navigate to="/sign-in" replace />;
   }
 
-  // Render protected content
   return <>{children}</>;
 };
 

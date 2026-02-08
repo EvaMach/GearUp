@@ -1,7 +1,7 @@
 export default {
   providers: [
     {
-      domain: process.env.CLERK_DOMAIN,
+      domain: 'https://settled-jawfish-42.clerk.accounts.dev',
       applicationID: 'convex',
     },
   ],

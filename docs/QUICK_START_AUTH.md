@@ -1,30 +1,3 @@
-# Quick Start: Authentication Setup
-
-Get authentication working in GearUp in 10 minutes.
-
-## Prerequisites
-
-- Node.js installed
-- Git repository cloned
-- Basic terminal knowledge
-
-## Step 1: Install Dependencies (Already Done)
-
-```bash
-npm install
-```
-
-The `@clerk/clerk-react` package is already installed.
-
-## Step 2: Create Clerk Account
-
-1. Go to [https://clerk.com/sign-up](https://clerk.com/sign-up)
-2. Sign up (free account is fine)
-3. Create a new application:
-   - Name: "GearUp Dev" (or any name)
-   - Select: **Email** and **Password**
-   - Click "Create Application"
-
 ## Step 3: Get Your Clerk Keys
 
 In your Clerk dashboard:
@@ -55,6 +28,7 @@ npx convex dev
 ```
 
 This will:
+
 - Ask you to log in (create account if needed)
 - Create a new Convex project
 - Give you a deployment URL
@@ -102,6 +76,7 @@ npx convex dev
 ```
 
 You should see output like:
+
 ```
 ✓ Schema updated
 ✓ Functions deployed
@@ -171,10 +146,12 @@ Try these flows to verify everything works:
 Now that authentication is working:
 
 1. **Review the code:**
+
    - Look at `src/components/auth/` for auth components
    - Check `convex/lib/auth.ts` for backend helpers
 
 2. **Read the documentation:**
+
    - `docs/AUTHENTICATION_SETUP.md` - Complete setup guide
    - `docs/IMPLEMENTATION_SUMMARY.md` - What was implemented
 

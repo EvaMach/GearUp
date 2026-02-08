@@ -1,40 +1,56 @@
 import { ConvexError } from 'convex/values';
 import { QueryCtx, MutationCtx } from '../_generated/server';
+import { Doc } from '../_generated/dataModel';
 
-/**
- * Get the authenticated user's Clerk ID
- * Throws error if not authenticated
- */
-export async function getUserId(
-  ctx: QueryCtx | MutationCtx
-): Promise<string> {
+export async function getUserId(ctx: QueryCtx | MutationCtx): Promise<string> {
   const identity = await ctx.auth.getUserIdentity();
 
   if (!identity) {
     throw new ConvexError('Authentication required');
   }
 
-  return identity.subject; // Clerk user ID
+  return identity.subject;
 }
 
-/**
- * Get or create user document from Clerk identity
- * Returns user document
- */
-export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
+async function getUserByClerkId(
+  ctx: QueryCtx | MutationCtx,
+  clerkId: string
+): Promise<Doc<'users'> | null> {
+  return ctx.db
+    .query('users')
+    .withIndex('by_clerk_id', (q) => q.eq('clerkId', clerkId))
+    .unique();
+}
+
+export async function getCurrentUser(
+  ctx: QueryCtx | MutationCtx
+): Promise<Doc<'users'>> {
   const identity = await ctx.auth.getUserIdentity();
 
   if (!identity) {
     throw new ConvexError('Authentication required');
   }
 
-  // Check if user exists
-  let user = await ctx.db
-    .query('users')
-    .withIndex('by_clerk_id', (q) => q.eq('clerkId', identity.subject))
-    .unique();
+  const user = await getUserByClerkId(ctx, identity.subject);
 
-  // Create user if doesn't exist
+  if (!user) {
+    throw new ConvexError('User not found');
+  }
+
+  return user;
+}
+
+export async function getOrCreateCurrentUser(
+  ctx: MutationCtx
+): Promise<Doc<'users'>> {
+  const identity = await ctx.auth.getUserIdentity();
+
+  if (!identity) {
+    throw new ConvexError('Authentication required');
+  }
+
+  let user = await getUserByClerkId(ctx, identity.subject);
+
   if (!user) {
     const userId = await ctx.db.insert('users', {
       clerkId: identity.subject,
@@ -48,12 +64,13 @@ export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
     user = await ctx.db.get(userId);
   }
 
+  if (!user) {
+    throw new ConvexError('User not found');
+  }
+
   return user;
 }
 
-/**
- * Verify user owns a resource by comparing user IDs
- */
 export async function verifyOwnership(
   ctx: QueryCtx | MutationCtx,
   resourceUserId: string | undefined,
@@ -61,7 +78,7 @@ export async function verifyOwnership(
 ): Promise<void> {
   const user = await getCurrentUser(ctx);
 
-  if (!resourceUserId || resourceUserId !== user?._id) {
+  if (!resourceUserId || resourceUserId !== user._id) {
     throw new ConvexError(`Unauthorized: You don't own this ${resourceType}`);
   }
 }

@@ -1,7 +1,6 @@
 // Seed data for the gear database
 // Run this with: npx convex run seed:seedGear
 
-import { v } from 'convex/values';
 import { mutation } from './_generated/server';
 
 const gearData = [

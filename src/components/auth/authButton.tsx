@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuth, UserButton, SignInButton } from '@clerk/clerk-react';
 
 interface AuthButtonProps {

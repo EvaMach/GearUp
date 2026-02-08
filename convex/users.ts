@@ -1,6 +1,6 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import { getCurrentUser } from './lib/auth';
+import { getCurrentUser, getOrCreateCurrentUser } from './lib/auth';
 
 /**
  * Get current user profile
@@ -28,7 +28,7 @@ export const updateProfile = mutation({
     name: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
 
     await ctx.db.patch(user._id, {
       name: args.name,

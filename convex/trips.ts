@@ -1,6 +1,6 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import { getCurrentUser } from './lib/auth';
+import { getCurrentUser, getOrCreateCurrentUser } from './lib/auth';
 import { ConvexError } from 'convex/values';
 
 /**
@@ -24,11 +24,12 @@ export const getUserTrips = query({
       .query('trips')
       .withIndex('by_user', (q) => q.eq('userId', user._id));
 
-    if (args.status) {
+    if (args.status !== undefined) {
+      const status = args.status;
       tripsQuery = ctx.db
         .query('trips')
         .withIndex('by_user_and_status', (q) =>
-          q.eq('userId', user._id).eq('status', args.status)
+          q.eq('userId', user._id).eq('status', status)
         );
     }
 
@@ -49,7 +50,7 @@ export const createTrip = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
 
     // Validate dates
     if (args.startDate && args.endDate && args.startDate > args.endDate) {
@@ -95,7 +96,7 @@ export const updateTrip = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
     const trip = await ctx.db.get(args.tripId);
 
     if (!trip) {
@@ -140,7 +141,7 @@ export const deleteTrip = mutation({
     tripId: v.id('trips'),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
     const trip = await ctx.db.get(args.tripId);
 
     if (!trip) {

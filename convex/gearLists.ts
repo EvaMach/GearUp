@@ -1,17 +1,17 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import { getCurrentUser } from './lib/auth';
+import { getCurrentUser, getOrCreateCurrentUser } from './lib/auth';
 import { ConvexError } from 'convex/values';
 
-/**
- * Get user's gear lists
- */
 export const getUserGearLists = query({
   args: {
     tripId: v.optional(v.id('trips')),
   },
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
+    if (!user) {
+      throw new ConvexError('Unauthorized');
+    }
 
     let query = ctx.db
       .query('gearLists')
@@ -58,6 +58,9 @@ export const getGearListWithItems = query({
   },
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
+    if (!user) {
+      throw new ConvexError('Unauthorized');
+    }
     const gearList = await ctx.db.get(args.gearListId);
 
     if (!gearList) {
@@ -103,7 +106,10 @@ export const createGearList = mutation({
     tripId: v.optional(v.id('trips')),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
+    if (!user) {
+      throw new ConvexError('Unauthorized');
+    }
 
     // If tripId provided, verify ownership
     if (args.tripId) {
@@ -141,7 +147,10 @@ export const addItemToGearList = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
+    if (!user) {
+      throw new ConvexError('Unauthorized');
+    }
     const gearList = await ctx.db.get(args.gearListId);
 
     if (!gearList) {
@@ -201,7 +210,10 @@ export const toggleItemPacked = mutation({
     itemId: v.id('gearListItems'),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
+    if (!user) {
+      throw new ConvexError('Unauthorized');
+    }
     const item = await ctx.db.get(args.itemId);
 
     if (!item) {
@@ -235,7 +247,10 @@ export const removeItemFromGearList = mutation({
     itemId: v.id('gearListItems'),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
+    if (!user) {
+      throw new ConvexError('Unauthorized');
+    }
     const item = await ctx.db.get(args.itemId);
 
     if (!item) {
@@ -272,7 +287,10 @@ export const deleteGearList = mutation({
     gearListId: v.id('gearLists'),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getOrCreateCurrentUser(ctx);
+    if (!user) {
+      throw new ConvexError('Unauthorized');
+    }
     const gearList = await ctx.db.get(args.gearListId);
 
     if (!gearList) {
