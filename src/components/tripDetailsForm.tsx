@@ -19,7 +19,9 @@ const TripDetailsForm = (): JSX.Element => {
   });
 
   const onSubmit = (formValues: TripDetails): void => {
-    navigate('/gear-list', { state: { ...formValues, timestamp: Date.now().toString() } });
+    navigate('/gear-list', {
+      state: { ...formValues, timestamp: Date.now().toString() },
+    });
   };
 
   return (
@@ -29,9 +31,9 @@ const TripDetailsForm = (): JSX.Element => {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="flex flex-col gap-2">
-          <div className='flex flex-col bg-white/60 p-8 rounded-xl'>
+          <div className="flex flex-col bg-white/60 p-8 rounded-xl">
             <label className="block">
-              <h2 className='mb-4'>Na kolik dní?</h2>
+              <h2 className="mb-4">Na kolik dní?</h2>
               <input
                 defaultValue={3}
                 min={1}
@@ -41,7 +43,7 @@ const TripDetailsForm = (): JSX.Element => {
               />
             </label>
           </div>
-          <div className='flex flex-col bg-white/60 p-8 rounded-xl'>
+          <div className="flex flex-col bg-white/60 p-8 rounded-xl">
             <label className="flex flex-col font-medium">
               <h2 className="mb-4">Typ výletu:</h2>
               <div className="flex items-center gap-10">

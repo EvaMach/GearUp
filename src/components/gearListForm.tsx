@@ -1,5 +1,5 @@
 import { SingleValue } from 'react-select';
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
   GearItemToPack,
   GroupedGearListToPack,
@@ -9,9 +9,11 @@ import { useGearSearch } from '../api/useGearSearch';
 import { debounce } from 'lodash';
 import ListItem from './listItem';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { Id } from '../../convex/_generated/dataModel';
 import { TripDetails } from './tripDetailsForm';
+import { useAuth } from '@clerk/clerk-react';
 
 interface LocalData {
   data: GroupedGearListToPack;
@@ -42,12 +44,18 @@ interface Props {
 
 const GearListForm = ({ tripDetails }: Props): JSX.Element => {
   const { searchGear } = useGearSearch();
+  const { isLoaded, isSignedIn } = useAuth();
   const [groupWhereAlreaady, setGroupWhereAlready] = useState<string | null>(
     null
   );
   const [gearList, setGearList] = useState<GroupedGearListToPack | undefined>(
     undefined
   );
+  const prevIsSignedIn = useRef<boolean | null>(null);
+  const hasSavedRef = useRef(false);
+
+  const createGearList = useMutation(api.gearLists.createGearList);
+  const addItemToGearList = useMutation(api.gearLists.addItemToGearList);
 
   const gearData = useQuery(api.gear.getGear, {
     type: tripDetails.type as 'tent' | 'hotel' | undefined,
@@ -85,6 +93,47 @@ const GearListForm = ({ tripDetails }: Props): JSX.Element => {
       );
     }
   }, [gearList, tripDetails.timestamp]);
+
+  const saveToAccount = useCallback(
+    async (list: GroupedGearListToPack) => {
+      const date = new Date().toLocaleDateString('en-GB');
+      const listName = `${tripDetails.type ?? 'camping'} trip – ${date}`;
+      const gearListId = await createGearList({ name: listName });
+
+      const allItems = Object.values(list).flat();
+      const catalogItems = allItems.filter(
+        (item): item is GearItemToPack & { _id: string } =>
+          item._id !== undefined
+      );
+
+      await Promise.all(
+        catalogItems.map((item) =>
+          addItemToGearList({
+            gearListId,
+            gearId: item._id as Id<'gear'>,
+            quantity: item.amount === 0 ? 1 : item.amount,
+          })
+        )
+      );
+
+      localStorage.removeItem('gearList');
+    },
+    [createGearList, addItemToGearList, tripDetails.type]
+  );
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (
+      prevIsSignedIn.current === false &&
+      isSignedIn === true &&
+      gearList !== undefined &&
+      !hasSavedRef.current
+    ) {
+      hasSavedRef.current = true;
+      saveToAccount(gearList);
+    }
+    prevIsSignedIn.current = isSignedIn ?? false;
+  }, [isSignedIn, isLoaded, gearList, saveToAccount]);
 
   const fetchSuggestions = async (inputValue: string) => {
     try {
