@@ -17,7 +17,14 @@ interface Props {
   checked: boolean;
 }
 
-const ListItem = ({ group, name, count, onRemove, onCheck, checked }: Props): JSX.Element => {
+const ListItem = ({
+  group,
+  name,
+  count,
+  onRemove,
+  onCheck,
+  checked,
+}: Props): JSX.Element => {
   const [itemCount, setItemCount] = useState(count);
 
   const removeItem = (): void => {
@@ -41,7 +48,7 @@ const ListItem = ({ group, name, count, onRemove, onCheck, checked }: Props): JS
   return (
     <div className="flex gap-2 justify-center">
       <div className="flex items-center gap-0.5">
-        <div className='p-2'>{Math.ceil(itemCount)}</div>
+        <div className="p-2">{Math.ceil(itemCount)}</div>
         <IconButton
           className="bg-primaryHighlight p-1 h-6 aspect-square rounded-full flex items-center justify-center"
           onClick={(): void => changeItemCount('plus')}
@@ -65,14 +72,12 @@ const ListItem = ({ group, name, count, onRemove, onCheck, checked }: Props): JS
         ) : (
           <UncheckedIcon className="w-4" />
         )}
-        <div className="text-left">
-          {name}
-        </div>
+        <div className="text-left">{name}</div>
       </button>
       <IconButton onClick={removeItem}>
         <BinIcon className="fill-gray-300 w-4 hover:fill-accent" />
       </IconButton>
-    </div >
+    </div>
   );
 };
 

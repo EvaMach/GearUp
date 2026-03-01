@@ -1,4 +1,3 @@
-
 const ShoppingList = (): JSX.Element => {
   return (
     <>

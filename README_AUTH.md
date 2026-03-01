@@ -23,33 +23,36 @@ GearUp helps you pack for camping trips quickly and without stress. Create gear 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-org/GearUp.git
    cd GearUp
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up authentication**
-   
+
    Follow our [Quick Start Auth Guide](docs/QUICK_START_AUTH.md) (takes ~10 minutes)
-   
+
    Or see the [Complete Authentication Setup](docs/AUTHENTICATION_SETUP.md)
 
 4. **Run the development server**
+
    ```bash
    # Terminal 1: Start Convex
    npx convex dev
-   
+
    # Terminal 2: Start Vite
    npm run dev
    ```
 
 5. **Open the app**
-   
+
    Navigate to [http://localhost:5173](http://localhost:5173)
 
 ## 📚 Documentation
@@ -62,6 +65,7 @@ GearUp helps you pack for camping trips quickly and without stress. Create gear 
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 18** - UI framework
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
@@ -70,6 +74,7 @@ GearUp helps you pack for camping trips quickly and without stress. Create gear 
 - **Clerk** - Authentication
 
 ### Backend
+
 - **Convex** - Backend platform (database, API, real-time)
 - **TypeScript** - Backend functions
 
@@ -113,6 +118,7 @@ GearUp/
 GearUp uses **Clerk** for authentication and **Convex** for data management.
 
 ### Features
+
 - Email/password authentication
 - OAuth (Google, GitHub) - optional
 - Secure session management
@@ -120,12 +126,14 @@ GearUp uses **Clerk** for authentication and **Convex** for data management.
 - Automatic user creation
 
 ### Routes
+
 - `/` - Public home page
 - `/sign-in` - Sign-in page
 - `/sign-up` - Sign-up page
 - `/gear-list` - Protected gear list page (requires auth)
 
 ### Data Model
+
 - **Users** - Synced from Clerk
 - **Trips** - User-specific trips
 - **Gear Lists** - User-specific lists
@@ -165,6 +173,7 @@ See `.env.example` for template.
 ## 🚧 Current Status
 
 ### ✅ Implemented
+
 - User authentication (sign-up, sign-in, sign-out)
 - Protected routes
 - User profile display
@@ -173,11 +182,13 @@ See `.env.example` for template.
 - Security and authorization
 
 ### ⏳ In Progress
+
 - Gear list integration with authenticated backend
 - Trip management UI
 - Data migration from local storage
 
 ### 📋 Planned
+
 - Profile management page
 - Multiple gear lists per user
 - Trip-specific gear lists

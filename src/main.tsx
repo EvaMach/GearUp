@@ -10,7 +10,6 @@ import HomePage from './components/homePage';
 import GearListPage from './components/gearListPage';
 import SignInPage from './components/auth/signInPage';
 import SignUpPage from './components/auth/signUpPage';
-import ProtectedRoute from './components/auth/protectedRoute';
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
@@ -33,11 +32,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/gear-list',
-        element: (
-          <ProtectedRoute>
-            <GearListPage />
-          </ProtectedRoute>
-        ),
+        element: <GearListPage />,
       },
     ],
   },

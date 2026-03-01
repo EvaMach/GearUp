@@ -1,4 +1,4 @@
-import TripDetailsForm from "./tripDetailsForm";
+import TripDetailsForm from './tripDetailsForm';
 
 const HomePage = (): JSX.Element => {
   return (
