@@ -12,6 +12,7 @@ export default {
     extend: {
       fontFamily: {
         niramit: ['Niramit', 'sans-serif'],
+        'plus-jakarta': ['"Plus Jakarta Sans"', 'sans-serif'],
       },
       colors: {
         primary: '#D4E9DA',

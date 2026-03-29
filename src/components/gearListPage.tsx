@@ -10,18 +10,22 @@ const GearListPage = (): JSX.Element => {
   const { isLoaded, isSignedIn } = useAuth();
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full">
-      {isLoaded && !isSignedIn && (
-        <div className="flex justify-end w-full px-8">
-          <SignUpButton mode="modal">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-              Save list
-            </button>
-          </SignUpButton>
+    <div className="-mx-3 sm:-mx-6 min-h-screen font-plus-jakarta relative">
+      <div className="mountain-bg fixed inset-0 -z-20" />
+      <div className="scenic-overlay fixed inset-0 -z-10" />
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pb-12 pt-6 max-w-5xl mx-auto flex flex-col gap-6">
+        <div className="flex justify-between items-start">
+          <TripDetailsBoard details={tripDetails} />
+          {isLoaded && !isSignedIn && (
+            <SignUpButton mode="modal">
+              <button className="glass-effect shrink-0 bg-[#2D5A27] text-white px-5 py-2.5 rounded-2xl font-extrabold text-sm transition-all hover:opacity-90 shadow-lg uppercase tracking-wider">
+                Save list
+              </button>
+            </SignUpButton>
+          )}
         </div>
-      )}
-      <TripDetailsBoard details={tripDetails} />
-      <GearListForm tripDetails={tripDetails} />
+        <GearListForm tripDetails={tripDetails} />
+      </div>
     </div>
   );
 };

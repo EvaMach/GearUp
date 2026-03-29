@@ -3,7 +3,6 @@ import {
   CheckedIcon,
   MinusIcon,
   PlusIcon,
-  UncheckedIcon,
 } from '../libs/icons/icons';
 import IconButton from './iconButton';
 import { useState } from 'react';
@@ -46,37 +45,53 @@ const ListItem = ({
   };
 
   return (
-    <div className="flex gap-2 justify-center">
-      <div className="flex items-center gap-0.5">
-        <div className="p-2">{Math.ceil(itemCount)}</div>
-        <IconButton
-          className="bg-primaryHighlight p-1 h-6 aspect-square rounded-full flex items-center justify-center"
-          onClick={(): void => changeItemCount('plus')}
+    <div className="glass-effect p-4 rounded-3xl shadow-lg border-white/30">
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={(): void => onCheck(group, name)}
+          className="shrink-0"
         >
-          <PlusIcon className="fill-textColor w-2" />
-        </IconButton>
-        <IconButton
-          className="bg-primaryHighlight p-1 h-6 aspect-square rounded-full flex items-center justify-center"
-          onClick={(): void => changeItemCount('minus')}
-        >
-          <MinusIcon className="fill-textColor w-2" />
-        </IconButton>
+          {checked ? (
+            <div className="w-7 h-7 bg-[#2D5A27] rounded-xl flex items-center justify-center shadow-md">
+              <CheckedIcon className="w-4 fill-white" />
+            </div>
+          ) : (
+            <div className="w-7 h-7 border-2 border-slate-300 rounded-xl hover:border-[#2D5A27] transition-colors" />
+          )}
+        </button>
+        <div className="flex-1 min-w-0">
+          <h3
+            className={`font-bold text-slate-900 ${
+              checked ? 'line-through opacity-40' : ''
+            }`}
+          >
+            {name}
+          </h3>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center bg-black/5 rounded-xl p-1">
+            <IconButton
+              className="w-6 h-6 flex items-center justify-center text-slate-500"
+              onClick={(): void => changeItemCount('minus')}
+            >
+              <MinusIcon className="fill-slate-500 w-2.5" />
+            </IconButton>
+            <span className="w-6 text-center text-xs font-black text-slate-900">
+              {Math.ceil(itemCount)}
+            </span>
+            <IconButton
+              className="w-6 h-6 flex items-center justify-center text-slate-500"
+              onClick={(): void => changeItemCount('plus')}
+            >
+              <PlusIcon className="fill-slate-500 w-2.5" />
+            </IconButton>
+          </div>
+          <IconButton onClick={removeItem} className="p-2">
+            <BinIcon className="fill-slate-400 w-5 hover:fill-red-500 transition-colors" />
+          </IconButton>
+        </div>
       </div>
-      <button
-        type="button"
-        onClick={(): void => onCheck(group, name)}
-        className="grid grid-cols-[2rem_minmax(6rem,_1fr)_2rem] border-2 min-w-5 lg:min-w-15 justify-between items-center p-1 min-h-min rounded-lg px-2 w-48"
-      >
-        {checked ? (
-          <CheckedIcon className="w-4" />
-        ) : (
-          <UncheckedIcon className="w-4" />
-        )}
-        <div className="text-left">{name}</div>
-      </button>
-      <IconButton onClick={removeItem}>
-        <BinIcon className="fill-gray-300 w-4 hover:fill-accent" />
-      </IconButton>
     </div>
   );
 };

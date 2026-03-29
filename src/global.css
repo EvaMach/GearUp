@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,27 +30,74 @@
   }
 
   .gear-select {
-    width: 12rem;
-    left: 7px;
-
-    @media (min-width: 1024px) {
-      min-width: 15rem;
-    }
+    width: 100%;
 
     .gear-select__control {
-      @apply border-2;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 1rem;
+      padding: 0.25rem 0.25rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
     }
 
     .gear-select__control:hover,
     .gear-select__control--is-focused {
-      @apply border-accent;
-      @apply border-2;
-      box-shadow: none;
+      border-color: #2d5a27;
+      border-width: 1px;
+      box-shadow: 0 0 0 1px #2d5a27;
     }
 
     .gear-select__option:hover,
     .gear-select__option--is-focused {
-      @apply bg-borderColor;
+      background-color: rgba(45, 90, 39, 0.1);
     }
+
+    .gear-select__menu {
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    .gear-select__placeholder {
+      color: rgb(100, 116, 139);
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+@layer utilities {
+  .mountain-bg {
+    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAnmeGfDPIuYlWdXdgJdJm-CJ7YKSqiUum3MVuWqbHqiwBTcQBcUW8oEfgv_zAJGToqgHxrP8I9Q4iwZgzYYHqk5mYW5hgItExZgR14Lsit86Y7-fleSgtXPDtbDiiGQmmnWjufxs6hxJuutM2PLPSKQPXxZhPpS4c-nRILDPaplwDEse5SdEFhady6IRE3Sz2jtGxqhxQ10MJxXUjA70gx6viEJF6fK4brCrLkqXu9KW26Y3uZQC28Txi8dHVOm7x9xehH2Nd_kfQJ');
+    background-size: cover;
+    background-position: center 20%;
+    background-attachment: fixed;
+  }
+
+  .scenic-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.4) 100%
+    );
+  }
+
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .glass-header {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 }
